@@ -12,25 +12,15 @@ end
 #   on the same page
 
 Then /I should see "(.*)" before "(.*)"/ do |e1, e2|
-  # ensure that that e1 occurs before e2.
-  # page.content is the entire content of the page as a string.
-  content = page.body.to_s
+  content = page.body.to_s #Take the entire body of the page and turn it into a string
   
-  # get the position of the movie names in the content string
-  e1_index = content.index(e1)
+  # get the position of the movie names substrings in the content string
+  e1_index = content.index(e1) 
   e2_index = content.index(e2)
-  
   assert e1_index < e2_index, "Expected to see #{e1} before #{e2} in the movie list"
 end
 
-# Make it easier to express checking or unchecking several boxes at once
-#  "When I uncheck the following ratings: PG, G, R"
-#  "When I check the following ratings: G"
-
 When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
-  # HINT: use String#split to split up the rating_list, then
-  #   iterate over the ratings and reuse the "When I check..." or
-  #   "When I uncheck..." steps in lines 89-95 of web_steps.rb
   checkAction = (uncheck) ? "uncheck" : "check" # either select check or uncheck
   ratings = rating_list.split ', ' # break apart the ratings passed in
   ratings.each do |r| # for each movie passed in call the appropriate 
@@ -41,11 +31,12 @@ When /I (un)?check the following ratings: (.*)/ do |uncheck, rating_list|
 end
 
 Then /^movies with the following ratings should (definitely|not) be visible: (.*)$/ do |visible, rating_list|
-  should_see_movies = (visible == "definitely")
-  ratings = rating_list.split(', ')
+  should_see_movies = (visible == "definitely") #Set should_see_movies to visible if they should be visible
+  ratings = rating_list.split(', ') #Split the ratings thing into an array to iterate through
   
   # subtract 1 to account for the table header row
-  rowCount = all("table#movies tr").count - 1
+  rowCount = all("table#movies tr").count - 1 #count the number of rows by counting occurance
+                                              # of table row tag in html
   
   if should_see_movies
     movies = Movie.find(:all, :conditions => [ "rating IN (?)", ratings ])
